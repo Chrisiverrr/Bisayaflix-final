@@ -11,9 +11,9 @@ export default function Home() {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch('https://hianime-api.vercel.app/trending')
+        const res = await fetch('https://hianime-api.vercel.app/api/trending')
         const data = await res.json()
-        setTrendingAnime(data.results)
+        setTrendingAnime(data.results || [])
         setLoading(false)
       } catch (error) {
         console.error('Error fetching anime:', error)
@@ -39,11 +39,15 @@ export default function Home() {
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
           </div>
-        ) : (
+        ) : trendingAnime.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {trendingAnime.map(anime => (
               <AnimeCard key={anime.id} anime={anime} />
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-10">
+            <p>No anime found. API might be down.</p>
           </div>
         )}
       </main>
@@ -51,4 +55,4 @@ export default function Home() {
       <Footer />
     </div>
   )
-          }
+    }
