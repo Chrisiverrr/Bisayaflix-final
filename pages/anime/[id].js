@@ -14,7 +14,7 @@ export default function AnimeDetails() {
     
     const fetchAnime = async () => {
       try {
-        const res = await fetch(`https://hianime-api.vercel.app/info/${id}`)
+        const res = await fetch(`https://hianime-api.vercel.app/api/info?id=${id}`)
         const data = await res.json()
         setAnime(data)
         setLoading(false)
@@ -38,7 +38,7 @@ export default function AnimeDetails() {
   if (!anime) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
-        <p>Anime not found</p>
+        <p>Anime not found. The API might be down.</p>
       </div>
     )
   }
@@ -88,4 +88,4 @@ export default function AnimeDetails() {
       <Footer />
     </div>
   )
-          }
+      }
