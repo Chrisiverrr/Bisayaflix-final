@@ -1,58 +1,62 @@
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import Header from '../components/Header'
-import AnimeCard from '../components/AnimeCard'
-import Footer from '../components/Footer'
-import { useEffect, useState } from 'react'
+import AnimeCard from '@/components/AnimeCard'
 
 export default function Home() {
-  const [trendingAnime, setTrendingAnime] = useState([])
+  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchTrending = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('https://hianime-api.vercel.app/api/trending')
-        const data = await res.json()
-        setTrendingAnime(data.results || [])
+        const res = await fetch('/api/v1/home')
+        const json = await res.json()
+        setData(json.data)
         setLoading(false)
       } catch (error) {
-        console.error('Error fetching anime:', error)
+        console.error('Error fetching data:', error)
         setLoading(false)
       }
     }
-    fetchTrending()
+    fetchData()
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <>
       <Head>
         <title>BisayaFlix - Watch Anime Online</title>
-        <meta name="description" content="Watch anime online for free on BisayaFlix" />
+        <meta name="description" content="Watch anime online for free" />
       </Head>
 
-      <Header />
-
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Trending Anime</h1>
-        
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
           </div>
-        ) : trendingAnime.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {trendingAnime.map(anime => (
-              <AnimeCard key={anime.id} anime={anime} />
-            ))}
-          </div>
         ) : (
-          <div className="text-center py-10">
-            <p>No anime found. API might be down.</p>
-          </div>
+          <>
+            <Section title="Spotlight" animeList={data?.spotlight} />
+            <Section title="Trending Now" animeList={data?.trending} />
+            <Section title="Top Airing" animeList={data?.topAiring} />
+            <Section title="New Added" animeList={data?.newAdded} />
+          </>
         )}
       </main>
+    </>
+  )
+}
 
-      <Footer />
+function Section({ title, animeList }) {
+  if (!animeList?.length) return null
+
+  return (
+    <div className="mb-12">
+      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {animeList.slice(0, 12).map(anime => (
+          <AnimeCard key={anime.id} anime={anime} />
+        ))}
+      </div>
     </div>
   )
-    }
+          }
